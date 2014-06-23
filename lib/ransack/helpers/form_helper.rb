@@ -35,6 +35,17 @@ module Ransack
         form_for(record, options, &proc)
       end
 
+      def write_choice(name, f)
+        content_tag(:div) do
+          value = params[:q][name.to_sym] if params[:q]
+          predicate = params[:q]["predicate_#{name}".to_sym] if params[:q]
+          a = sort_link(@search, name.to_sym) + "<br>".html_safe
+          b = f.predicate_select( {only: [:start, :end, :cont, :not_cont, :eq, :not_eq, :in, :not_in, :null, :not_null], compounds: false, selected: predicate}, {id: "q[predicate_#{name}]", name: "q[predicate_#{name}]"}) + "<br>".html_safe
+          c = f.search_field name.to_sym, value: value
+          return a + b + c
+        end
+      end
+
       def sort_link(search, attribute, *args)
         # Extract out a routing proxy for url_for scoping later
         if search.is_a?(Array)
