@@ -21,6 +21,7 @@ module Ransack
       @context.auth_object = options[:auth_object]
       @base = Nodes::Grouping.new(@context, 'and')
       @scope_args = {}
+      $params = params
       build(params.with_indifferent_access)
     end
 
