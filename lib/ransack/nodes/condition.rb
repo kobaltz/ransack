@@ -34,7 +34,7 @@ module Ransack
         def extract_attributes_and_predicate(key)
           str = key.dup
           name = Predicate.detect_and_strip_from_string!(str)
-          predicate = Predicate.named(name)
+          predicate = Predicate.named(name) || Predicate.named($params["predicate_#{str}".to_sym])
           unless predicate || Ransack.options[:ignore_unknown_conditions]
             raise ArgumentError, "No valid predicate for #{key}"
           end
