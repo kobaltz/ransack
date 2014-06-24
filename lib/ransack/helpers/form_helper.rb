@@ -35,13 +35,22 @@ module Ransack
         form_for(record, options, &proc)
       end
 
-      def write_choice(name, f)
+      def write_choice(search, name, f, assoc=nil, label=nil)
         content_tag(:div) do
-          value = params[:q][name.to_sym] if params[:q]
-          predicate = params[:q]["predicate_#{name}".to_sym] if params[:q]
-          a = sort_link(@search, name.to_sym) + "<br>".html_safe
-          b = f.predicate_select( {only: [:start, :end, :cont, :not_cont, :eq, :not_eq, :in, :not_in, :null, :not_null], compounds: false, selected: predicate}, {id: "q[predicate_#{name}]", name: "q[predicate_#{name}]"}) + "<br>".html_safe
-          c = f.search_field name.to_sym, value: value
+          calc_label = label || name.titleize
+          if assoc
+            value = params[:q]["#{assoc}_#{name}".to_sym] if params[:q]
+            predicate = params[:q]["predicate_#{name}".to_sym] if params[:q]
+            a = sort_link(search, "#{assoc}.#{name}".to_sym, calc_label) + "<br>".html_safe
+            b = f.predicate_select( {only: [:start, :end, :cont, :not_cont, :eq, :not_eq, :in, :not_in, :null, :not_null], compounds: false, selected: predicate}, {id: "q[predicate_#{assoc}_#{name}]", name: "q[predicate_#{assoc}_#{name}]"}) + "<br>".html_safe
+            c = f.search_field("#{assoc}_#{name}".to_sym, value: value, class: 'search_field')
+          else
+            value = params[:q][name.to_sym] if params[:q]
+            predicate = params[:q]["predicate_#{name}".to_sym] if params[:q]
+            a = sort_link(search, name.to_sym, calc_label) + "<br>".html_safe
+            b = f.predicate_select( {only: [:start, :end, :cont, :not_cont, :eq, :not_eq, :in, :not_in, :null, :not_null], compounds: false, selected: predicate}, {id: "q[predicate_#{name}]", name: "q[predicate_#{name}]"}) + "<br>".html_safe
+            c = f.search_field(name.to_sym, value: value, class: 'search_field')
+          end
           return a + b + c
         end
       end
